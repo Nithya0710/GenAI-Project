@@ -1,0 +1,3 @@
+# React app goes here
+# Initialize with: npx create-react-app . --template typescript
+# Or with Vite: npm create vite@latest . -- --template react-ts
