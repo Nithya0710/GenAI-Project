@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import documents
+from app.routers import generate as generate_router
 
 app = FastAPI(
     title="Smart Revision Generator API",
@@ -19,6 +20,7 @@ app.add_middleware(
 
 # Routers
 app.include_router(documents.router, prefix="/api", tags=["documents"])
+app.include_router(generate_router.router, prefix="/api", tags=["generate"])
 
 @app.get("/health")
 def health_check():

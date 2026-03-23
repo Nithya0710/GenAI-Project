@@ -28,6 +28,9 @@ async def upload_document(file: UploadFile = File(...)):
     # Generate a doc ID for this session
     doc_id = str(uuid.uuid4())
 
+    from app.routers.generate import DOC_STORE
+    DOC_STORE[doc_id] = extracted_text
+
     return {
         "doc_id":      doc_id,
         "filename":    file.filename,

@@ -1,0 +1,71 @@
+version: "3.9"
+
+# ---------------------------------------------------------------------------
+# Smart Revision Generator — Docker Compose
+#
+# Usage:
+#   docker compose up --build          # first time / after code changes
+#   docker compose up                  # subsequent runs (uses cached images)
+#   docker compose down                # stop and remove containers
+#   docker compose logs -f backend     # tail backend logs
+#
+# Environment:
+#   Copy .env.example to .env and fill in GOOGLE_API_KEY before running.
+# ---------------------------------------------------------------------------
+
+services:
+
+  # --------------------------------------------------------------------------
+  # Backend — FastAPI (uvicorn)
+  # --------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: srg_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-1.5-pro}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Hot-reload: mount source so uvicorn --reload picks up changes
+      - ./backend:/app
+    networks:
+      - srg_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # --------------------------------------------------------------------------
+  # Frontend — Vite dev server (React)
+  # --------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: srg_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      # Hot-reload: mount source so Vite HMR works
+      - ./frontend:/app
+      # Prevent host node_modules from overwriting container's
+      - /app/node_modules
+    networks:
+      - srg_net
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  srg_net:
+    driver: bridge
