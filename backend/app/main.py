@@ -28,3 +28,7 @@ def health_check():
         "status": "ok",
         "message": "Smart Revision Generator API is running"
     }
+
+from app.routers.process import router as process_router
+
+app.include_router(process_router)
