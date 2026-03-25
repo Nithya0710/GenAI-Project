@@ -3,9 +3,9 @@ fastapi==0.111.0
 uvicorn[standard]==0.30.1
 
 # File parsing
-pymupdf==1.24.5          # PDF parsing (imports as 'fitz')
-python-pptx==0.6.23      # PPTX parsing
-python-docx==1.1.2       # DOCX parsing
+pymupdf==1.24.5
+python-pptx==0.6.23
+python-docx==1.1.2
 
 # File uploads
 python-multipart==0.0.9
@@ -13,10 +13,14 @@ python-multipart==0.0.9
 # Environment variables
 python-dotenv==1.0.1
 
+# Validation
+pydantic==2.7.4
+typing-extensions==4.12.2
+
 # Testing
 pytest==8.2.2
 pytest-asyncio==0.23.7
-httpx==0.27.0            # async test client for FastAPI
+httpx==0.27.0
 
 # Utilities
 aiofiles==23.2.1

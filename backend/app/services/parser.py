@@ -63,3 +63,39 @@ def parse_document(filename: str, file_bytes: bytes) -> str:
         raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
 
     return parsers[ext](file_bytes)
+
+from typing import List
+
+
+def parse_pdf_chunks(file_bytes: bytes) -> List[str]:
+    """Return PDF text as list of page-wise chunks."""
+    full_text = parse_pdf(file_bytes)
+    return [chunk.strip() for chunk in full_text.split("\n\n") if chunk.strip()]
+
+
+def parse_docx_chunks(file_bytes: bytes) -> List[str]:
+    """Return DOCX text as list of paragraph chunks."""
+    full_text = parse_docx(file_bytes)
+    return [chunk.strip() for chunk in full_text.split("\n\n") if chunk.strip()]
+
+
+def parse_pptx_chunks(file_bytes: bytes) -> List[str]:
+    """Return PPTX text as list of slide-wise chunks."""
+    full_text = parse_pptx(file_bytes)
+    return [chunk.strip() for chunk in full_text.split("\n\n") if chunk.strip()]
+
+
+def parse_document_chunks(filename: str, file_bytes: bytes) -> List[str]:
+    """Return document as List[str] chunks."""
+    ext = os.path.splitext(filename)[-1].lower()
+
+    parsers = {
+        ".pdf": parse_pdf_chunks,
+        ".docx": parse_docx_chunks,
+        ".pptx": parse_pptx_chunks,
+    }
+
+    if ext not in parsers:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
+
+    return parsers[ext](file_bytes)
