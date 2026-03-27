@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import documents
 from app.routers import generate as generate_router
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Load environment variables from .env file
+
 app = FastAPI(
     title="Smart Revision Generator API",
     description="GenAI-based system for intelligent study and revision support",

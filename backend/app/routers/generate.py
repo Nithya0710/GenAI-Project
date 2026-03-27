@@ -1,11 +1,8 @@
 """
-generate.py — FastAPI router for all LLM-powered generation endpoints.
+generate.py — FastAPI router for LLM-powered generation endpoints.
 
-Endpoints:
-  POST /api/summarize     → Markdown summary
-  POST /api/flashcards    → JSON flashcard set
-  POST /api/faq           → JSON FAQ set
-  POST /api/mock-quiz     → JSON quiz set
+v2: passes doc_id to every llm_service function so RAG context
+is used automatically when the FAISS index is ready.
 """
 
 from fastapi import APIRouter, HTTPException
@@ -20,57 +17,45 @@ from app.services.llm_service import (
 
 router = APIRouter()
 
-# ---------------------------------------------------------------------------
-# In-memory document store (temporary — replace with vector DB / Redis later)
-# The /upload endpoint in documents.py stores full_text here keyed by doc_id.
-# ---------------------------------------------------------------------------
-
-# This dict is imported and written to by documents.py after a successful upload.
+# In-memory text store (keyed by doc_id, written by documents.py after upload)
 DOC_STORE: dict[str, str] = {}
 
 
 def _get_text(doc_id: str) -> str:
-    """Retrieve document text or raise 404."""
     text = DOC_STORE.get(doc_id)
     if not text:
         raise HTTPException(
             status_code=404,
-            detail=f"Document '{doc_id}' not found. Please upload it first."
+            detail=f"Document '{doc_id}' not found. Please upload it first.",
         )
     return text
 
 
 # ---------------------------------------------------------------------------
-# Request / Response schemas
+# Request schemas
 # ---------------------------------------------------------------------------
 
 class SummarizeRequest(BaseModel):
     doc_id: str
-    difficulty: str = Field(
-        default="Intermediate",
-        description="Basic | Intermediate | Advanced"
-    )
+    difficulty: str = Field(default="Intermediate")
 
 
 class FlashcardRequest(BaseModel):
     doc_id: str
     difficulty: str = "Intermediate"
-    num_cards: int = Field(default=15, ge=5, le=40)
+    num_cards: int  = Field(default=15, ge=5, le=40)
 
 
 class FAQRequest(BaseModel):
     doc_id: str
     difficulty: str = "Intermediate"
-    num_faqs: int = Field(default=10, ge=3, le=20)
+    num_faqs: int   = Field(default=10, ge=3, le=20)
 
 
 class MockQuizRequest(BaseModel):
     doc_id: str
-    difficulty: str = "Intermediate"
-    question_type: str = Field(
-        default="mcq",
-        description="mcq | short_answer | long_answer"
-    )
+    difficulty: str    = "Intermediate"
+    question_type: str = Field(default="mcq")
     num_questions: int = Field(default=5, ge=3, le=15)
 
 
@@ -80,78 +65,49 @@ class MockQuizRequest(BaseModel):
 
 @router.post("/summarize")
 async def summarize(req: SummarizeRequest):
-    """
-    Generate a structured Markdown summary from an uploaded document.
-    """
-    text = _get_text(req.doc_id)
-    summary = generate_summary(text, difficulty=req.difficulty)
-    return {
-        "doc_id":     req.doc_id,
-        "difficulty": req.difficulty,
-        "summary":    summary,
-    }
+    text    = _get_text(req.doc_id)
+    summary = generate_summary(text, difficulty=req.difficulty, doc_id=req.doc_id)
+    return {"doc_id": req.doc_id, "difficulty": req.difficulty, "summary": summary}
 
 
 @router.post("/flashcards")
 async def flashcards(req: FlashcardRequest):
-    """
-    Generate a set of flashcards (term → definition) from an uploaded document.
-    """
-    text = _get_text(req.doc_id)
+    text   = _get_text(req.doc_id)
     result = generate_flashcards(
-        text,
-        difficulty=req.difficulty,
-        num_cards=req.num_cards,
+        text, difficulty=req.difficulty,
+        num_cards=req.num_cards, doc_id=req.doc_id,
     )
-    return {
-        "doc_id":     req.doc_id,
-        "difficulty": req.difficulty,
-        **result,
-    }
+    return {"doc_id": req.doc_id, "difficulty": req.difficulty, **result}
 
 
 @router.post("/faq")
 async def faq(req: FAQRequest):
-    """
-    Generate Frequently Asked Questions from an uploaded document.
-    """
-    text = _get_text(req.doc_id)
+    text   = _get_text(req.doc_id)
     result = generate_faqs(
-        text,
-        difficulty=req.difficulty,
-        num_faqs=req.num_faqs,
+        text, difficulty=req.difficulty,
+        num_faqs=req.num_faqs, doc_id=req.doc_id,
     )
-    return {
-        "doc_id":     req.doc_id,
-        "difficulty": req.difficulty,
-        **result,
-    }
+    return {"doc_id": req.doc_id, "difficulty": req.difficulty, **result}
 
 
 @router.post("/mock-quiz")
 async def mock_quiz(req: MockQuizRequest):
-    """
-    Generate exam-style questions from an uploaded document.
-    Supports MCQ, short-answer, and long-answer types.
-    """
     valid_types = {"mcq", "short_answer", "long_answer"}
     if req.question_type not in valid_types:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid question_type '{req.question_type}'. "
-                   f"Must be one of: {valid_types}"
+            detail=f"Invalid question_type. Must be one of: {valid_types}",
         )
-
-    text = _get_text(req.doc_id)
+    text   = _get_text(req.doc_id)
     result = generate_mock_quiz(
-        text,
-        difficulty=req.difficulty,
+        text, difficulty=req.difficulty,
         question_type=req.question_type,
         num_questions=req.num_questions,
+        doc_id=req.doc_id,
     )
     return {
-        "doc_id":        req.doc_id,
-        "difficulty":    req.difficulty,
+        "doc_id": req.doc_id,
+        "difficulty": req.difficulty,
         "question_type": req.question_type,
         **result,
     }

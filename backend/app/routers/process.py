@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 from app.services.parser import parse_document_chunks
-from app.services.cleaner import clean_text
+# from app.services.cleaner import clean_text
 from app.services.chunker import chunk_text
 
 router = APIRouter()
