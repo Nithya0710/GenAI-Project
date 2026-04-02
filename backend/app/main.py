@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import documents
 from app.routers import generate as generate_router
 from app.routers.process import router as process_router
+from app.routers.chat import router as chat_router
 
 from dotenv import load_dotenv
 import os
@@ -28,6 +29,7 @@ app.add_middleware(
 app.include_router(documents.router, prefix="/api", tags=["documents"])
 app.include_router(generate_router.router, prefix="/api", tags=["generate"])
 app.include_router(process_router, prefix="/api", tags=["process"])
+app.include_router(chat_router, prefix="/api", tags=["chat"])
 
 @app.get("/health")
 def health_check():
