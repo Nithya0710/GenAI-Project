@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { AlignLeft, Copy, CheckCheck } from 'lucide-react'
 import { useState } from 'react'
 
+// shows the summary of the document with options to select difficulty and copy the summary text to clipboard
 export default function SummaryPage() {
   const { notebookId } = useParams()
   const { state } = useLocation()

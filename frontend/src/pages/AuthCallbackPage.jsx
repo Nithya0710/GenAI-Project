@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { BookOpen, Loader2, AlertCircle } from 'lucide-react'
 
+// handles the callback from google oauth login flow
 export default function AuthCallbackPage() {
   const [searchParams] = useSearchParams()
   const { loginWithToken } = useAuth()

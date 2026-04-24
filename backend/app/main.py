@@ -19,6 +19,7 @@ import os
 
 load_dotenv()
 
+# fastapi app instance
 app = FastAPI(
     title="Smart Revision Generator API",
     description="GenAI-based system for intelligent study and revision support",
@@ -35,6 +36,7 @@ allowed_origins = os.getenv(
     "http://localhost:5173,http://localhost:3000"
 ).split(",")
 
+# add cors middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

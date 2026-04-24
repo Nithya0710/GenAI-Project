@@ -5,6 +5,7 @@ import ToolPageLayout from '../components/ToolPageLayout'
 import { Layers, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 
+// a simple flip card component with 3D rotation effect
 function FlipCard({ front, back, topic }) {
   const [flipped, setFlipped] = useState(false)
 
