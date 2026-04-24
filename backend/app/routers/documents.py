@@ -50,11 +50,11 @@ async def upload_document(
 
     doc_id = str(uuid.uuid4())
 
-    # Store full text for immediate generation requests
+   
     from app.routers.generate import DOC_STORE
     DOC_STORE[doc_id] = extracted_text
 
-    # Kick off embedding in the background — non-blocking
+   
     background_tasks.add_task(
         _ingest_background, doc_id, file.filename, file_bytes
     )
