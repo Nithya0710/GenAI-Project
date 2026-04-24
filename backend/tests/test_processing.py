@@ -13,7 +13,7 @@ def load_sample(filename: str) -> bytes:
         return f.read()
 
 
-# ── Chunk Parser Tests ─────────────────────────────────────────
+# ── Chunk Parser Tests ─────────────────────────────────
 
 def test_parse_document_chunks_pdf():
     pdf_bytes = load_sample("sample.pdf")
@@ -40,7 +40,7 @@ def test_parse_document_chunks_pptx():
     assert len(chunks) > 0
 
 
-# ── /process Endpoint Tests ────────────────────────────────────
+# ── /process Endpoint Tests ───────────────────────────
 
 def test_process_endpoint_pdf():
     path = os.path.join(os.path.dirname(__file__), "sample_files", "sample.pdf")
