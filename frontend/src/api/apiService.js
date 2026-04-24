@@ -4,7 +4,6 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
 })
 
-// Attach JWT Bearer token to every outgoing request
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('srg_token')
   if (token) {
