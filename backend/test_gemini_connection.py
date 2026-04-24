@@ -18,7 +18,6 @@ import os
 import sys
 import traceback
 
-# Load .env manually so this script works without FastAPI
 try:
     from dotenv import load_dotenv
     load_dotenv()
