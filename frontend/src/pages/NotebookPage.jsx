@@ -12,7 +12,7 @@ import {
 
 const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000' })
 
-// ── Left Panel: Resources ─────────────────────────────────────────────────
+// ── Left Panel: Resources ────────────────────────────────────────────
 function ResourcePanel({ notebook, onAddDoc, onRemoveDoc, selectedDocId, onSelectDoc }) {
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
@@ -114,7 +114,7 @@ function ResourcePanel({ notebook, onAddDoc, onRemoveDoc, selectedDocId, onSelec
   )
 }
 
-// ── Centre Panel: Chat ────────────────────────────────────────────────────
+// ── Centre Panel: Chat ─────────────────────────────────────────────
 function ChatPanel({ docId, docName }) {
   const [messages, setMessages] = useState([
     {
